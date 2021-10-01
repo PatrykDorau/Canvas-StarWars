@@ -25,9 +25,16 @@ addEventListener('resize', () => {
 
   init()
 })
+let mousedown = false
+addEventListener('mousedown', () => {
+ mousedown = true
+})
+addEventListener('mouseup', () => {
+ mousedown = false
+})
 
 // Objects
-class Object {
+class Particle {
   constructor(x, y, radius, color) {
     this.x = x
     this.y = y
@@ -38,6 +45,8 @@ class Object {
   draw() {
     c.beginPath()
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+    c.shadowColor = this.color
+    c.shadowBlur = 15
     c.fillStyle = this.color
     c.fill()
     c.closePath()
@@ -49,24 +58,46 @@ class Object {
 }
 
 // Implementation
-let objects
+let particles
 function init() {
-  objects = []
+  particles = []
 
-  for (let i = 0; i < 400; i++) {
-    // objects.push()
+  for (let i = 0; i < 600; i++) {
+    const canvasWidth = canvas.width+ 1000
+    const canvasHeight = canvas.height+ 1000
+    const x = (Math.random() * canvasWidth) - canvasWidth / 2
+    const y = (Math.random() * canvasHeight) - canvasHeight / 2
+    const radius = Math.random() * 2
+    const color = colors[Math.floor(Math.random() * colors.length)]
+     particles.push(new Particle(x, y, radius, color))
   }
 }
 
 // Animation Loop
+let radians = 0
+let alpha = 1
 function animate() {
   requestAnimationFrame(animate)
-  c.clearRect(0, 0, canvas.width, canvas.height)
+  c.fillStyle = `rgba(10, 10, 10, ${alpha})`
+  c.fillRect(0, 0, canvas.width, canvas.height)
 
-  c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y)
-  // objects.forEach(object => {
-  //  object.update()
-  // })
+  c.save()
+  c.translate(canvas.width / 2, canvas.height / 2)
+  c.rotate(radians)
+  particles.forEach(particle => {
+    particle.update()
+   })
+  c.restore()
+
+  radians+= 0.002
+  if(mousedown){
+    radians += 0.004
+  }
+  if(mousedown && alpha >= 0.001){
+    alpha -= 0.005
+  }else if(!mousedown && alpha < 1){
+    alpha += 0.001
+  }
 }
 
 init()
