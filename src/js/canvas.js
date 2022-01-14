@@ -71,6 +71,7 @@ function init() {
     const color = colors[Math.floor(Math.random() * colors.length)]
      particles.push(new Particle(x, y, radius, color))
   }
+  alert("Hold left mouse button")
 }
 
 // Animation Loop
